@@ -53,11 +53,13 @@ class ThaiYearFormatter extends Formatter{
     }
 
 
-    public function asDate($value, $format = null){
+    public function asDate($value, $format = null)
+    {
         if ($format === null) {
             $format = $this->dateFormat;
         }
-        return $this->replaceYear($this->formatDateTimeValue($value, $format, 'date'));
+        $year = $this->formatDateTimeValue($value, "php:Y", 'date');
+        return $this->replaceYears($this->formatDateTimeValue($value, $format, 'date'), $year);
     }
 
     public function asDatetime($value, $format = null)
@@ -65,7 +67,8 @@ class ThaiYearFormatter extends Formatter{
         if ($format === null) {
             $format = $this->datetimeFormat;
         }
-        return $this->replaceYear($this->formatDateTimeValue($value, $format, 'datetime'));
+        $year = $this->formatDateTimeValue($value, "php:Y", 'date');
+        return $this->replaceYears($this->formatDateTimeValue($value, $format, 'datetime'), $year);
     }
 
     private function formatDateTimeValue($value, $format, $type)
@@ -172,7 +175,7 @@ class ThaiYearFormatter extends Formatter{
      */
     public function setThaiYear(DateTime $timestamp){
         if($this->checkThaiLocale()){
-            return $timestamp->setDate(($timestamp->format('Y')+543),$timestamp->format('m'),$timestamp->format('d'));
+            return $timestamp->setDate($timestamp->format('Y'),$timestamp->format('m'),$timestamp->format('d'));
         }else{
             return $timestamp;
         }
@@ -186,6 +189,20 @@ class ThaiYearFormatter extends Formatter{
     {
       return str_replace('ค.ศ.','พ.ศ.',$strDate);
     }
+
+    /**
+     * replace Year
+     * @param  string $strDate
+     * @param  int $year
+     * @return string date
+     */
+    public function replaceYears($strDate, $year)
+    {
+        $year = is_numeric($year)?$year:0;
+        return str_replace(['ค.ศ.', $year], ['พ.ศ.', ($year + 543)], $strDate);
+    }
+
+ 
     /**
      * check is Thai Locale
      * @return string date
